@@ -23,6 +23,58 @@ class Minute extends Subexpression {
   }
 }
 
+class Hour extends Subexpression {
+  print(): string {
+    let print = '';
+    if (this.all) {
+      for (let i = 0; i <= 23; i++) {
+        if (i !== 0) print += ' ';
+        print += i.toString();
+      }
+    }
+    return print;
+  }
+}
+
+class DayOfMonth extends Subexpression {
+  print(): string {
+    let print = '';
+    if (this.all) {
+      for (let i = 1; i <= 31; i++) {
+        if (i !== 1) print += ' ';
+        print += i.toString();
+      }
+    }
+    return print;
+  }
+}
+
+class Month extends Subexpression {
+  print(): string {
+    let print = '';
+    if (this.all) {
+      for (let i = 1; i <= 12; i++) {
+        if (i !== 1) print += ' ';
+        print += i.toString();
+      }
+    }
+    return print;
+  }
+}
+
+class DayOfWeek extends Subexpression {
+  print(): string {
+    let print = '';
+    if (this.all) {
+      for (let i = 0; i <= 6; i++) {
+        if (i !== 0) print += ' ';
+        print += i.toString();
+      }
+    }
+    return print;
+  }
+}
+
 class CronExpression {
   expressions: {[key: string]: Subexpression} = {};
   command = '';
@@ -34,16 +86,16 @@ class CronExpression {
           this.expressions['minute'] = new Minute(value);
           break;
         case 1:
-          this.expressions['hour'] = new Subexpression(value);
+          this.expressions['hour'] = new Hour(value);
           break;
         case 2:
-          this.expressions['day_of_month'] = new Subexpression(value);
+          this.expressions['day_of_month'] = new DayOfMonth(value);
           break;
         case 3:
-          this.expressions['month'] = new Subexpression(value);
+          this.expressions['month'] = new Month(value);
           break;
         case 4:
-          this.expressions['day_of_week'] = new Subexpression(value);
+          this.expressions['day_of_week'] = new DayOfWeek(value);
           break;
         case 5:
           this.command = value;
