@@ -1,19 +1,32 @@
 class Subexpression {
   all = false;
   increment = 1;
+  range = {
+    enabled: false,
+    start: 0,
+    end: 0,
+  };
   constructor(value: string) {
     if (value === '*') {
       this.all = true;
-    } else if (value.indexOf('/')) {
+    } else if (value.indexOf('/') >= 0) {
       const incrementExpr = value.split('/');
       if (
         incrementExpr[0] !== '*' ||
         typeof incrementExpr[1] === 'number' ||
         incrementExpr.length > 2
       ) {
-        throwAnError();
+        validationError('Invalid increment expression');
       }
       this.increment = parseInt(incrementExpr[1]);
+    } else if (value.indexOf('-') >= 0) {
+      const range = value.split('-');
+      if (typeof range[0] === 'number' || typeof range[1] === 'number') {
+        validationError('Invalid range expression');
+      }
+      this.range.enabled = true;
+      this.range.start = parseInt(range[0]);
+      this.range.end = parseInt(range[1]);
     }
   }
   print(): string {
@@ -26,8 +39,19 @@ class Minute extends Subexpression {
   end = 59;
   print(): string {
     let print = '';
+    if (this.range.enabled) {
+      if (
+        this.range.start > this.range.end ||
+        this.range.start < this.start ||
+        this.range.end > this.end
+      ) {
+        validationError('Invalid range values');
+      }
+      this.start = this.range.start;
+      this.end = this.range.end;
+    }
     for (let i = this.start; i <= this.end; i += this.increment) {
-      if (i !== 0) print += ' ';
+      if (i !== this.start) print += ' ';
       print += i.toString();
     }
 
@@ -113,7 +137,7 @@ class CronExpression {
           this.command = value;
           break;
         default:
-          throwAnError();
+          validationError('Invalid cron expression');
       }
     });
   }
@@ -134,6 +158,6 @@ export default function parse(expression: string): string[] {
   return cronExpression.print();
 }
 
-function throwAnError(): void {
-  throw new Error('Invalid cron expression');
+function validationError(message: string): void {
+  throw new Error(message);
 }

@@ -20,11 +20,25 @@ const every_15_minutes = [
   'command /usr/bin/find',
 ];
 
+const every_minute_from_1_to_15 = [
+  'minute 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15',
+  'hour 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23',
+  'day_of_month 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31',
+  'month 1 2 3 4 5 6 7 8 9 10 11 12',
+  'day_of_week 0 1 2 3 4 5 6',
+  'command /usr/bin/find',
+];
+
 describe('valid expressions', () => {
   it('every minute', () => {
     expect(parse('* * * * * /usr/bin/find')).toEqual(every_minute);
   });
   it('every 15 minutes', () => {
     expect(parse('*/15 * * * * /usr/bin/find')).toEqual(every_15_minutes);
+  });
+  it('every minute from 1 through 15', () => {
+    expect(parse('1-15 * * * * /usr/bin/find')).toEqual(
+      every_minute_from_1_to_15
+    );
   });
 });
