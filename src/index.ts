@@ -1,55 +1,64 @@
 class Subexpression {
-  every = false;
+  all = false;
   constructor(value: string) {
     if (value === '*') {
-      this.every = true;
+      this.all = true;
     }
   }
   print(): string {
-    return this.every ? 'every' : '';
+    return this.all ? 'every' : '';
+  }
+}
+
+class Minute extends Subexpression {
+  print(): string {
+    let print = '';
+    if (this.all) {
+      for (let i = 0; i <= 59; i++) {
+        if (i !== 0) print += ' ';
+        print += i.toString();
+      }
+    }
+    return print;
   }
 }
 
 class CronExpression {
-  minute: Subexpression | undefined;
-  hour: Subexpression | undefined;
-  day_of_month: Subexpression | undefined;
-  month: Subexpression | undefined;
-  day_of_week: Subexpression | undefined;
-  command: string | undefined;
+  expressions: {[key: string]: Subexpression} = {};
+  command = '';
 
-  constructor(expressions: string[]) {
-    expressions.map((value, i) => {
+  constructor(parts: string[]) {
+    parts.map((value, i) => {
       switch (i) {
         case 0:
-          this.minute = new Subexpression(value);
+          this.expressions['minute'] = new Minute(value);
           break;
         case 1:
-          this.hour = new Subexpression(value);
+          this.expressions['hour'] = new Subexpression(value);
           break;
         case 2:
-          this.day_of_month = new Subexpression(value);
+          this.expressions['day_of_month'] = new Subexpression(value);
           break;
         case 3:
-          this.month = new Subexpression(value);
+          this.expressions['month'] = new Subexpression(value);
           break;
         case 4:
-          this.day_of_week = new Subexpression(value);
+          this.expressions['day_of_week'] = new Subexpression(value);
           break;
         case 5:
           this.command = value;
           break;
+        default:
+          throw new Error('Invalid cron expression');
       }
     });
   }
 
   print(): string[] {
     const print: string[] = [];
-
-    print.push('minute ' + this.minute?.print());
-    print.push('hour ' + this.hour?.print());
-    print.push('day_of_month ' + this.day_of_month?.print());
-    print.push('day_of_week ' + this.day_of_week?.print());
+    Object.entries(this.expressions).forEach(([key, value]) =>
+      print.push(key + ' ' + value.print())
+    );
     print.push('command ' + this.command);
 
     return print;
