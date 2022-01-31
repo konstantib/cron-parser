@@ -1,8 +1,19 @@
 class Subexpression {
   all = false;
+  increment = 1;
   constructor(value: string) {
     if (value === '*') {
       this.all = true;
+    } else if (value.indexOf('/')) {
+      const incrementExpr = value.split('/');
+      if (
+        incrementExpr[0] !== '*' ||
+        typeof incrementExpr[1] === 'number' ||
+        incrementExpr.length > 2
+      ) {
+        throwAnError();
+      }
+      this.increment = parseInt(incrementExpr[1]);
     }
   }
   print(): string {
@@ -11,14 +22,15 @@ class Subexpression {
 }
 
 class Minute extends Subexpression {
+  start = 0;
+  end = 59;
   print(): string {
     let print = '';
-    if (this.all) {
-      for (let i = 0; i <= 59; i++) {
-        if (i !== 0) print += ' ';
-        print += i.toString();
-      }
+    for (let i = this.start; i <= this.end; i += this.increment) {
+      if (i !== 0) print += ' ';
+      print += i.toString();
     }
+
     return print;
   }
 }
@@ -101,7 +113,7 @@ class CronExpression {
           this.command = value;
           break;
         default:
-          throw new Error('Invalid cron expression');
+          throwAnError();
       }
     });
   }
@@ -120,4 +132,8 @@ class CronExpression {
 export default function parse(expression: string): string[] {
   const cronExpression = new CronExpression(expression.split(' '));
   return cronExpression.print();
+}
+
+function throwAnError(): void {
+  throw new Error('Invalid cron expression');
 }
