@@ -75,4 +75,19 @@ describe('invalid expressions', () => {
   it('no values provided', () => {
     expect(parse('')).toEqual(['Invalid expression']);
   });
+  it('too many provided', () => {
+    expect(parse('1 2 3 4 5 6 7')).toEqual(['Invalid cron expression']);
+  });
+  it('invalid increment', () => {
+    expect(parse('*/b')).toEqual(['Invalid increment expression']);
+  });
+  it('invalid range', () => {
+    expect(parse('a-1')).toEqual(['Invalid range expression']);
+  });
+  it('invalid list', () => {
+    expect(parse('1,2,*')).toEqual(['Invalid list expression']);
+  });
+  it('invalid value', () => {
+    expect(parse('a')).toEqual(['Invalid expression']);
+  });
 });
