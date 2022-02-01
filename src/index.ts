@@ -6,27 +6,41 @@ class Subexpression {
     start: 0,
     end: 0,
   };
+  list: number[] = [];
   constructor(value: string) {
     if (value === '*') {
       this.all = true;
     } else if (value.indexOf('/') >= 0) {
       const incrementExpr = value.split('/');
+      const increment = parseInt(incrementExpr[1]);
       if (
         incrementExpr[0] !== '*' ||
-        typeof incrementExpr[1] === 'number' ||
+        isNaN(increment) ||
         incrementExpr.length > 2
       ) {
         validationError('Invalid increment expression');
       }
-      this.increment = parseInt(incrementExpr[1]);
+      this.increment = increment;
     } else if (value.indexOf('-') >= 0) {
       const range = value.split('-');
-      if (typeof range[0] === 'number' || typeof range[1] === 'number') {
+      const rangeStart = parseInt(range[0]);
+      const rangeEnd = parseInt(range[1]);
+      if (isNaN(rangeStart) || isNaN(rangeEnd)) {
         validationError('Invalid range expression');
       }
       this.range.enabled = true;
-      this.range.start = parseInt(range[0]);
-      this.range.end = parseInt(range[1]);
+      this.range.start = rangeStart;
+      this.range.end = rangeEnd;
+    } else if (value.indexOf(',') >= 0) {
+      const listParams = value.split(',');
+      listParams.map(item => {
+        const itemInt = parseInt(item);
+        if (isNaN(itemInt)) {
+          validationError('Invalid list expression');
+        } else {
+          this.list.push(itemInt);
+        }
+      });
     }
   }
   print(): string {
@@ -39,6 +53,7 @@ class Minute extends Subexpression {
   end = 59;
   print(): string {
     let print = '';
+
     if (this.range.enabled) {
       if (
         this.range.start > this.range.end ||
@@ -50,9 +65,14 @@ class Minute extends Subexpression {
       this.start = this.range.start;
       this.end = this.range.end;
     }
-    for (let i = this.start; i <= this.end; i += this.increment) {
-      if (i !== this.start) print += ' ';
-      print += i.toString();
+
+    if (this.list.length > 0) {
+      print = this.list.join(' ');
+    } else {
+      for (let i = this.start; i <= this.end; i += this.increment) {
+        if (i !== this.start) print += ' ';
+        print += i.toString();
+      }
     }
 
     return print;
