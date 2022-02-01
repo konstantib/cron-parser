@@ -90,7 +90,7 @@ class CronExpression {
   expressions: {[key: string]: Subexpression} = {};
   command = '';
 
-  types: {[key: string]: Range} = {
+  ranges: {[key: string]: Range} = {
     minute: {
       start: 0,
       end: 59,
@@ -117,34 +117,19 @@ class CronExpression {
     parts.map((value, i) => {
       switch (i) {
         case 0:
-          this.expressions['minute'] = new Subexpression(
-            value,
-            this.types['minute']
-          );
+          this.createSubexpression('minute', value);
           break;
         case 1:
-          this.expressions['hour'] = new Subexpression(
-            value,
-            this.types['hour']
-          );
+          this.createSubexpression('hour', value);
           break;
         case 2:
-          this.expressions['day_of_month'] = new Subexpression(
-            value,
-            this.types['day_of_month']
-          );
+          this.createSubexpression('day_of_month', value);
           break;
         case 3:
-          this.expressions['month'] = new Subexpression(
-            value,
-            this.types['month']
-          );
+          this.createSubexpression('month', value);
           break;
         case 4:
-          this.expressions['day_of_week'] = new Subexpression(
-            value,
-            this.types['day_of_week']
-          );
+          this.createSubexpression('day_of_week', value);
           break;
         case 5:
           this.command = value;
@@ -153,6 +138,10 @@ class CronExpression {
           validationError('Invalid cron expression');
       }
     });
+  }
+
+  createSubexpression(name: string, value: string) {
+    this.expressions[name] = new Subexpression(value, this.ranges[name]);
   }
 
   print(): string[] {
