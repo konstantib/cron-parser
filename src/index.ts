@@ -75,57 +75,6 @@ class Subexpression {
     return print;
   }
 }
-class Hour extends Subexpression {
-  print(): string {
-    let print = '';
-    if (this.all) {
-      for (let i = 0; i <= 23; i++) {
-        if (i !== 0) print += ' ';
-        print += i.toString();
-      }
-    }
-    return print;
-  }
-}
-
-class DayOfMonth extends Subexpression {
-  print(): string {
-    let print = '';
-    if (this.all) {
-      for (let i = 1; i <= 31; i++) {
-        if (i !== 1) print += ' ';
-        print += i.toString();
-      }
-    }
-    return print;
-  }
-}
-
-class Month extends Subexpression {
-  print(): string {
-    let print = '';
-    if (this.all) {
-      for (let i = 1; i <= 12; i++) {
-        if (i !== 1) print += ' ';
-        print += i.toString();
-      }
-    }
-    return print;
-  }
-}
-
-class DayOfWeek extends Subexpression {
-  print(): string {
-    let print = '';
-    if (this.all) {
-      for (let i = 0; i <= 6; i++) {
-        if (i !== 0) print += ' ';
-        print += i.toString();
-      }
-    }
-    return print;
-  }
-}
 
 interface Range {
   start: number;
@@ -141,6 +90,22 @@ class CronExpression {
       start: 0,
       end: 59,
     },
+    hour: {
+      start: 0,
+      end: 23,
+    },
+    day_of_month: {
+      start: 1,
+      end: 31,
+    },
+    month: {
+      start: 1,
+      end: 12,
+    },
+    day_of_week: {
+      start: 0,
+      end: 6,
+    },
   };
 
   constructor(parts: string[]) {
@@ -153,16 +118,28 @@ class CronExpression {
           );
           break;
         case 1:
-          this.expressions['hour'] = new Hour(value, undefined);
+          this.expressions['hour'] = new Subexpression(
+            value,
+            this.types['hour']
+          );
           break;
         case 2:
-          this.expressions['day_of_month'] = new DayOfMonth(value, undefined);
+          this.expressions['day_of_month'] = new Subexpression(
+            value,
+            this.types['day_of_month']
+          );
           break;
         case 3:
-          this.expressions['month'] = new Month(value, undefined);
+          this.expressions['month'] = new Subexpression(
+            value,
+            this.types['month']
+          );
           break;
         case 4:
-          this.expressions['day_of_week'] = new DayOfWeek(value, undefined);
+          this.expressions['day_of_week'] = new Subexpression(
+            value,
+            this.types['day_of_week']
+          );
           break;
         case 5:
           this.command = value;
