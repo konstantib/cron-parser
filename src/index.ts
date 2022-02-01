@@ -68,27 +68,43 @@ class Subexpression {
   }
 
   print(): string {
-    let print = '';
-
-    if (this.customRange.enabled) {
-      if (
-        this.customRange.start > this.range.end ||
-        this.customRange.start < this.range.start ||
-        this.customRange.end > this.range.end
-      ) {
-        validationError('Invalid range values');
-      }
-      this.range.start = this.customRange.start;
-      this.range.end = this.customRange.end;
+    if (this.listExpression()) {
+      return this.list.join(' ');
     }
 
-    if (this.list.length > 0) {
-      print = this.list.join(' ');
-    } else {
-      for (let i = this.range.start; i <= this.range.end; i += this.increment) {
-        if (i !== this.range.start) print += ' ';
-        print += i.toString();
-      }
+    if (this.customRange.enabled) {
+      this.setRangeToCustomValues();
+    }
+
+    return this.printAllRangeValues();
+  }
+
+  setRangeToCustomValues(): void {
+    this.validateRangeValues();
+    this.range.start = this.customRange.start;
+    this.range.end = this.customRange.end;
+  }
+
+  validateRangeValues(): void {
+    if (
+      this.customRange.start > this.range.end ||
+      this.customRange.start < this.range.start ||
+      this.customRange.end > this.range.end
+    ) {
+      validationError('Invalid range values');
+    }
+  }
+
+  listExpression(): boolean {
+    return this.list.length > 0;
+  }
+
+  printAllRangeValues(): string {
+    let print = '';
+
+    for (let i = this.range.start; i <= this.range.end; i += this.increment) {
+      if (i !== this.range.start) print += ' ';
+      print += i.toString();
     }
 
     return print;
