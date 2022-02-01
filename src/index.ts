@@ -1,16 +1,21 @@
 class Subexpression {
   all = false;
   increment = 1;
-  range = {
+  range: Range = {
+    start: 0,
+    end: 0,
+  };
+  customRange = {
     enabled: false,
     start: 0,
     end: 0,
   };
   list: number[] = [];
-  constructor(value: string) {
-    if (value === '*') {
-      this.all = true;
-    } else if (value.indexOf('/') >= 0) {
+
+  constructor(value: string, range: Range | undefined) {
+    if (range) this.range = range;
+    if (value === '*') this.all = true;
+    if (value.indexOf('/') >= 0) {
       const incrementExpr = value.split('/');
       const increment = parseInt(incrementExpr[1]);
       if (
@@ -28,9 +33,9 @@ class Subexpression {
       if (isNaN(rangeStart) || isNaN(rangeEnd)) {
         validationError('Invalid range expression');
       }
-      this.range.enabled = true;
-      this.range.start = rangeStart;
-      this.range.end = rangeEnd;
+      this.customRange.enabled = true;
+      this.customRange.start = rangeStart;
+      this.customRange.end = rangeEnd;
     } else if (value.indexOf(',') >= 0) {
       const listParams = value.split(',');
       listParams.map(item => {
@@ -44,33 +49,25 @@ class Subexpression {
     }
   }
   print(): string {
-    return this.all ? 'every' : '';
-  }
-}
-
-class Minute extends Subexpression {
-  start = 0;
-  end = 59;
-  print(): string {
     let print = '';
 
-    if (this.range.enabled) {
+    if (this.customRange.enabled) {
       if (
-        this.range.start > this.range.end ||
-        this.range.start < this.start ||
-        this.range.end > this.end
+        this.customRange.start > this.range.end ||
+        this.customRange.start < this.range.start ||
+        this.customRange.end > this.range.end
       ) {
         validationError('Invalid range values');
       }
-      this.start = this.range.start;
-      this.end = this.range.end;
+      this.range.start = this.customRange.start;
+      this.range.end = this.customRange.end;
     }
 
     if (this.list.length > 0) {
       print = this.list.join(' ');
     } else {
-      for (let i = this.start; i <= this.end; i += this.increment) {
-        if (i !== this.start) print += ' ';
+      for (let i = this.range.start; i <= this.range.end; i += this.increment) {
+        if (i !== this.range.start) print += ' ';
         print += i.toString();
       }
     }
@@ -78,7 +75,6 @@ class Minute extends Subexpression {
     return print;
   }
 }
-
 class Hour extends Subexpression {
   print(): string {
     let print = '';
@@ -131,27 +127,42 @@ class DayOfWeek extends Subexpression {
   }
 }
 
+interface Range {
+  start: number;
+  end: number;
+}
+
 class CronExpression {
   expressions: {[key: string]: Subexpression} = {};
   command = '';
+
+  types: {[key: string]: Range} = {
+    minute: {
+      start: 0,
+      end: 59,
+    },
+  };
 
   constructor(parts: string[]) {
     parts.map((value, i) => {
       switch (i) {
         case 0:
-          this.expressions['minute'] = new Minute(value);
+          this.expressions['minute'] = new Subexpression(
+            value,
+            this.types['minute']
+          );
           break;
         case 1:
-          this.expressions['hour'] = new Hour(value);
+          this.expressions['hour'] = new Hour(value, undefined);
           break;
         case 2:
-          this.expressions['day_of_month'] = new DayOfMonth(value);
+          this.expressions['day_of_month'] = new DayOfMonth(value, undefined);
           break;
         case 3:
-          this.expressions['month'] = new Month(value);
+          this.expressions['month'] = new Month(value, undefined);
           break;
         case 4:
-          this.expressions['day_of_week'] = new DayOfWeek(value);
+          this.expressions['day_of_week'] = new DayOfWeek(value, undefined);
           break;
         case 5:
           this.command = value;
