@@ -167,10 +167,28 @@ class CronExpression {
 }
 
 export default function parse(expression: string): string[] {
-  const cronExpression = new CronExpression(expression.split(' '));
-  return cronExpression.print();
+  const print: string[] = [];
+  try {
+    const cronExpression = new CronExpression(expression.split(' '));
+    print.push(...cronExpression.print());
+  } catch (e) {
+    if (e instanceof Error) {
+      print.push(e.message);
+    }
+  }
+
+  return print;
 }
 
 function validationError(message: string): void {
   throw new Error(message);
 }
+
+// function isNumber(subject: any): number | undefined {
+//   const number = parseInt(subject);
+//   if (isNaN(number)) {
+//     return undefined;
+//   }
+
+//   return number;
+// }

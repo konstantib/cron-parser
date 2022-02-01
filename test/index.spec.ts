@@ -70,3 +70,9 @@ describe('valid expressions', () => {
     );
   });
 });
+
+describe('invalid expressions', () => {
+  it('no values provided', () => {
+    expect(parse('')).toEqual(['Invalid expression']);
+  });
+});
