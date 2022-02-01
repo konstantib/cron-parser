@@ -16,43 +16,57 @@ class Subexpression {
     if (value === '*') {
       return;
     } else if (value.indexOf('/') >= 0) {
-      const incrementExpr = value.split('/');
-      const increment = parseInt(incrementExpr[1]);
-      if (
-        incrementExpr[0] !== '*' ||
-        isNaN(increment) ||
-        incrementExpr.length > 2
-      ) {
-        validationError('Invalid increment expression');
-      }
-      this.increment = increment;
+      this.setIncrement(value.split('/'));
     } else if (value.indexOf('-') >= 0) {
-      const range = value.split('-');
-      const rangeStart = parseInt(range[0]);
-      const rangeEnd = parseInt(range[1]);
-      if (isNaN(rangeStart) || isNaN(rangeEnd)) {
-        validationError('Invalid range expression');
-      }
-      this.customRange.enabled = true;
-      this.customRange.start = rangeStart;
-      this.customRange.end = rangeEnd;
+      this.setRange(value.split('-'));
     } else if (value.indexOf(',') >= 0) {
-      const listParams = value.split(',');
-      listParams.map(item => {
-        const itemInt = parseInt(item);
-        if (isNaN(itemInt)) {
-          validationError('Invalid list expression');
-        } else {
-          this.list.push(itemInt);
-        }
-      });
+      this.setList(value.split(','));
     } else if (!isNaN(parseInt(value))) {
-      this.range.start = parseInt(value);
-      this.range.end = parseInt(value);
+      this.setSingleValue(value);
     } else {
       validationError('Invalid expression');
     }
   }
+
+  setIncrement(incrementExpr: string[]): void {
+    const increment = parseInt(incrementExpr[1]);
+    if (
+      incrementExpr[0] !== '*' ||
+      isNaN(increment) ||
+      incrementExpr.length > 2
+    ) {
+      validationError('Invalid increment expression');
+    }
+    this.increment = increment;
+  }
+
+  setRange(range: string[]): void {
+    const rangeStart = parseInt(range[0]);
+    const rangeEnd = parseInt(range[1]);
+    if (isNaN(rangeStart) || isNaN(rangeEnd)) {
+      validationError('Invalid range expression');
+    }
+    this.customRange.enabled = true;
+    this.customRange.start = rangeStart;
+    this.customRange.end = rangeEnd;
+  }
+
+  setList(listParams: string[]): void {
+    listParams.map(item => {
+      const itemInt = parseInt(item);
+      if (isNaN(itemInt)) {
+        validationError('Invalid list expression');
+      } else {
+        this.list.push(itemInt);
+      }
+    });
+  }
+
+  setSingleValue(value: string): void {
+    this.range.start = parseInt(value);
+    this.range.end = parseInt(value);
+  }
+
   print(): string {
     let print = '';
 
