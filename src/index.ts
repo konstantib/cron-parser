@@ -183,12 +183,3 @@ export default function parse(expression: string): string[] {
 function validationError(message: string): void {
   throw new Error(message);
 }
-
-// function isNumber(subject: any): number | undefined {
-//   const number = parseInt(subject);
-//   if (isNaN(number)) {
-//     return undefined;
-//   }
-
-//   return number;
-// }
