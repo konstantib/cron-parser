@@ -1,5 +1,4 @@
 class Subexpression {
-  all = false;
   increment = 1;
   range: Range = {
     start: 0,
@@ -14,7 +13,6 @@ class Subexpression {
 
   constructor(value: string, range: Range | undefined) {
     if (range) this.range = range;
-    if (value === '*') this.all = true;
     if (value.indexOf('/') >= 0) {
       const incrementExpr = value.split('/');
       const increment = parseInt(incrementExpr[1]);
