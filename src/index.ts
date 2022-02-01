@@ -11,9 +11,11 @@ class Subexpression {
   };
   list: number[] = [];
 
-  constructor(value: string, range: Range | undefined) {
-    if (range) this.range = range;
-    if (value.indexOf('/') >= 0) {
+  constructor(value: string, range: Range) {
+    this.range = range;
+    if (value === '*') {
+      return;
+    } else if (value.indexOf('/') >= 0) {
       const incrementExpr = value.split('/');
       const increment = parseInt(incrementExpr[1]);
       if (
@@ -44,6 +46,11 @@ class Subexpression {
           this.list.push(itemInt);
         }
       });
+    } else if (!isNaN(parseInt(value))) {
+      this.range.start = parseInt(value);
+      this.range.end = parseInt(value);
+    } else {
+      validationError('Invalid expression');
     }
   }
   print(): string {
