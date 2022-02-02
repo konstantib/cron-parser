@@ -91,3 +91,5 @@ export default function parse(expression: string): string[] {
 export function validationError(message: string): void {
   throw new Error(message);
 }
+
+console.log(parse(process.argv.slice(2)[0]));
